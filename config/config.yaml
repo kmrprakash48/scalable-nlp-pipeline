@@ -1,0 +1,121 @@
+# NLP Pipeline Configuration
+
+pipeline:
+  name: "scalable-nlp-pipeline"
+  version: "1.0.0"
+  environment: "production"
+
+# Data Ingestion Configuration
+ingestion:
+  sources:
+    - type: "api"
+      endpoint: "https://api.example.com/data"
+      auth_required: true
+    - type: "file"
+      path: "data/raw"
+      formats: ["json", "csv", "txt"]
+    - type: "database"
+      connection_string: "${DB_CONNECTION_STRING}"
+  batch_size: 1000
+  max_workers: 4
+
+# Data Preprocessing
+preprocessing:
+  text_cleaning:
+    lowercase: true
+    remove_punctuation: true
+    remove_stopwords: true
+    remove_urls: true
+    remove_emails: true
+    remove_numbers: false
+  tokenization:
+    method: "spacy"  # options: spacy, nltk, transformers
+    language: "en_core_web_sm"
+  normalization:
+    lemmatization: true
+    stemming: false
+
+# Feature Extraction
+feature_extraction:
+  methods:
+    - type: "tfidf"
+      max_features: 10000
+      ngram_range: [1, 2]
+    - type: "word2vec"
+      vector_size: 300
+      window: 5
+      min_count: 2
+    - type: "bert"
+      model_name: "bert-base-uncased"
+      max_length: 512
+
+# Model Training
+training:
+  model_type: "transformer"  # options: transformer, lstm, cnn, traditional
+  model_name: "distilbert-base-uncased"
+  hyperparameters:
+    learning_rate: 2e-5
+    batch_size: 16
+    epochs: 3
+    warmup_steps: 500
+    weight_decay: 0.01
+  validation_split: 0.2
+  early_stopping:
+    enabled: true
+    patience: 3
+    min_delta: 0.001
+
+# Model Evaluation
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1_score"]
+  confusion_matrix: true
+  classification_report: true
+
+# Deployment
+deployment:
+  model_serving:
+    framework: "fastapi"
+    host: "0.0.0.0"
+    port: 8000
+    workers: 4
+  scaling:
+    min_replicas: 2
+    max_replicas: 10
+    target_cpu_utilization: 70
+
+# Monitoring and Logging
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+  logging:
+    level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+    format: "json"
+    destination: "logs/pipeline.log"
+
+# Resource Management
+resources:
+  data_cache:
+    enabled: true
+    backend: "redis"
+    ttl: 3600
+  database:
+    type: "postgresql"
+    pool_size: 10
+    max_overflow: 20
+  message_queue:
+    backend: "celery"
+    broker: "redis://localhost:6379/0"
+    result_backend: "redis://localhost:6379/1"
+
+# Security
+security:
+  api_key_required: true
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+  cors:
+    enabled: true
+    allow_origins: ["*"]
+    allow_methods: ["GET", "POST"]
+    allow_headers: ["*"]
